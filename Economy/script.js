@@ -1,8 +1,9 @@
-
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0xffffff);
+
 document.body.appendChild(renderer.domElement);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -13,7 +14,6 @@ const rocketGeometry = new THREE.CylinderGeometry(1, 1, 5, 32);
 const rocketMaterial = new THREE.MeshStandardMaterial({ color: "red" });
 const rocket = new THREE.Mesh(rocketGeometry, rocketMaterial);
 scene.add(rocket);
-
 
 function createFin(type) {
     const geometry = new THREE.BufferGeometry();
@@ -43,9 +43,16 @@ function createFin(type) {
     geometry.computeVertexNormals();
     
     const material = new THREE.MeshStandardMaterial({ color: "blue", side: THREE.DoubleSide });
-    return new THREE.Mesh(geometry, material);
+    const fin = new THREE.Mesh(geometry, material);
+    
+   
+    const edges = new THREE.EdgesGeometry(geometry);
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
+    const finEdges = new THREE.LineSegments(edges, lineMaterial);
+    fin.add(finEdges);
+    
+    return fin;
 }
-
 
 let fins = [];
 function updateFins(type) {
@@ -61,17 +68,13 @@ function updateFins(type) {
     }
 }
 
-
 updateFins("classic");
-
 
 document.getElementById("finSelector").addEventListener("change", function () {
     updateFins(this.value);
 });
 
-
 camera.position.z = 8;
-
 
 function animate() {
     requestAnimationFrame(animate);
